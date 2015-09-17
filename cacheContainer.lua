@@ -4,7 +4,7 @@ CacheContainer = {}
 -- 存储所有cache数据，结构为type1:{key1=cache1, key2=cache2}
 CacheContainer.data = {}
 
-function CacheContainer:update(key, data, type)
+function CacheContainer:update(data, type, key)
 	local getCacheByType = function(key, type)
 		local map = self.data[type]
 		local val = nil
@@ -20,12 +20,18 @@ function CacheContainer:update(key, data, type)
 		return val
 	end
 
+	if key == nil then
+		key = getKeyFromJSON(data, type)
+	end
 	local cache = getCacheByType(key, type)
 	cache:update(data)
 	return cache
 end
 
 function CacheContainer:createCache(key, type)
+	if key == nil then
+		return nil
+	end
 	if type == cacheType["family"] then
 		return FamilyCache.new(key)
 	elseif type == cacheType["relative"] then
@@ -36,18 +42,12 @@ function CacheContainer:createCache(key, type)
 	return nil
 end
 
-data = {name = "123", detail = {img = "456"}}
+data = {name = "123", detail = {img = "456"}, id = "key3"}
 data1 = {name = "1234444"}
 
-fc = CacheContainer:update("key1", data, cacheType["family"])
-CacheContainer:update("key1", data1, cacheType["family"])
--- print(fc.key)
-print_r(CacheContainer.data)
+fc = CacheContainer:update(data, cacheType["family"])
+CacheContainer:update(data1, cacheType["family"], fc.key)
 
--- xxx = {["a"] = 1, ["b.c"] = 2}
--- for k,v in pairs(xxx) do
--- 	print(k,v)
--- end
 
 
 
