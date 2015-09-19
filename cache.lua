@@ -1,5 +1,6 @@
 require("defclass")
 require("print")
+require("notify")
 
 function inArray(array, value)
 	for k,v in pairs(array) do
@@ -11,9 +12,9 @@ function inArray(array, value)
 end
 
 -- cache的类型
-cacheType = {none = 0, relative = 1, family = 2, bluetooth = 3}
+cacheType = {none = "none", relative = "relative", family = "family", bluetooth = "bluetooth"}
 -- cache的基类
-cache = class()
+local cache = class()
 cache.key = nil
 cache.type = nil
 cache.properties = {}
@@ -22,10 +23,10 @@ function cache:ctor(key)
 	self.key = key
 end
 -- 通知函数
-function cache:nofity(name, oldValue, newValue)
+function cache:notify(name, oldValue, newValue)
 	assert(self.key, "the key is nil")
 	assert(self.type, "the type is nil")
-	print("nofity key:" .. self.key .. ",\ttype:" .. self.type .. ",\tproperty:" .. name .. ",\told value:" .. (oldValue or "nil") .. ",\tnew value:" .. (newValue or "nil"))
+	notify(self.key, self.type, name, oldValue, newValue)
 end
 -- 赋值函数，通过这个函数给属性赋值，并通知出去变化, 外部使用时，第三个参数不需要传
 function cache:setValue(property, value, notcheck)
@@ -33,7 +34,7 @@ function cache:setValue(property, value, notcheck)
 		old = rawget(self, property)
 		if value ~= old then
 			rawset (self, property, value)
-			self:nofity(property, old, value)
+			self:notify(property, old, value)
 		end
 	else
 		assert(nil, "property list can not contain " .. property)
